@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+
+ : Local Storage:
+ HOW TO STORE : OBJECT/ARRAY/MAP/SET 
+
+1.
+<div id="div4" style="background-color:#487DE9;"></div>
+<div id="div5" style="background-color:#487De4;"></div>
+<script>
+	let arr1 = ["pawan", "naugain", "webDev", 1234];
+	//in order to store object(object, array, set, map etc.) we need convert them into "string":
+	let strFy = JSON.stringify(arr1);
+	//now we store in server/Local Storage:
+	localStorage.setItem('p1',strFy);
+
+	//now we need this data to display or any other purpose:
+	let p2 = localStorage.getItem('p1');
+	console.log(p2);//["pawan","naugain","webDev",1234]
+	//now we change this data into JS Object: so we can use in js or in html:
+	let text2 = JSON.parse(p2);
+	console.log(p2);//["pawan","naugain","webDev",1234]
+
+	console.log(text2);//(4)['pawan', 'naugain', 'webDev', 1234]
+	div4.innerHTML = text2;//'pawan', 'naugain', 'webDev', 1234
+	div5.innerHTML = text2[1];//naugain 
+
+</script>
+2.
+
+<div id="div6" style="background-color:#8D4FE2;"></div>
+<div id="div7" style="background-color:brown;"></div>
+<script>
+	let object1 = {
+		id:1,
+		name:"tom",
+		email:"tom@example",
+		schadual:["Monday","Tuesday","Wednesday","Thursday","Friday"],
+		overTime:null 
+	}
+
+	//save it into Session Storage:
+	//in order to save in Server Or Storage, we need to convert it into String:
+	let one = JSON.stringify(object1);
+	//now store this string:
+	sessionStorage.setItem('ss1',one);
+	//now we get data to use :
+	let two = sessionStorage.getItem('ss1');
+	console.log(two);//OK
+	//we need it in form of JS OBJECT so we can use it:
+	let tx2 = JSON.parse(two);
+	document.getElementById('div6').innerHTML = tx2.id;//1
+	document.getElementById('div7').innerHTML = tx2.schadual[1];
+
+</script>
+	
+=================================================================
+
+HOW TO STORE DATA FROM 'MAP' & 'SET' IN LOCAL_STORAGE OR SERVER : 
+---------------------------------------------------------------------
+{USE ...SPREAD OPERATOR TO CONVERT MAP & SET INTO SHALLOW COPIES OF OBJECTS}
+  
+  The spread operator is a new addition to the set of operators in JavaScript ES6. 
+  It takes in an iterable (e.g an array) and expands it into individual elements. 
+  The spread operator is commonly used to make shallow copies of JS objects. 
+  Using this operator makes the code concise and enhances its readability.
+<script>
+	//1. STORE MAP():
+	let skillSet = {"Degree":"Associate","Technologies":["Html","CSS","JS","git_gitHub"]}
+	let myMap = new Map();
+	myMap.set('Name','Pawan Naugain')
+	     .set('City','Euless')
+	     .set('USA Nationality',false)
+	     .set('Qualification',skillSet)
+
+	console.log(myMap);
+	//use SPREAD OPERATOR 
+
+	let convertIntoarray = [...myMap];
+	console.log(convertIntoarray);
+
+	//stringify to save data:
+	let c2 = JSON.stringify(convertIntoarray);
+	localStorage.setItem('c3',c2);
+
+	localStorage.removeItem('c3');
+------------------------------------------------------	
+	//2. STORE OBJECT:
+	let myObject2 = {
+		name:"someName",
+		phone:12304,
+		email:"someName@example.com"
+	}
+	//store this data in Local Storage:
+	let a1 = JSON.stringify(myObject2);
+	sessionStorage.setItem('object2',a1);
+
+</script>
+
+</body>
+</html>

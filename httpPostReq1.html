@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+
+===========================HTTP REQ : GET : =========================
+befor POST its just Revison from Previous Chapter: 
+1. fetch API /Async-Await/ timeout/ error handling:
+<SCRIPT>
+const url1 = `https://jsonplaceholder.typicode.com/comments/1`
+const url2 =`https://jsonplaceholder.typicode.com/comments/2`
+const url3 = `https://jsonplaceholder.typicode.com/comments/3`
+</SCRIPT>
+
+<div id="div1" style="background-color:#45EECC;"></div>
+<p id="e1" style="color:red;"></p>
+<p id="e2" style="color:gray;"></p>
+
+<script>
+	async function async1(){
+
+		let timer = setTimeout(()=>{
+			new AbortController().abort();
+                  e1.innerHTML = `time _out`;
+		},2000);
+		let signal = new AbortController().signal;
+		let response = await fetch(url1,{
+			method:'GET',
+			signal:signal
+		})
+		clearTimeout(timer);
+		if(response.status>=400 && response.status<600){
+			throw new Error(`SERVER ERROR:${response.status}`);
+		}
+		else if(response.status!==200){
+			throw new Error(`NETWORK_ERR: ${response.status}`);
+		}
+
+		let result = await response.json();
+		return result;
+
+		
+	}
+	async1()
+	.then(data=>{
+		console.log(data);
+		div1.innerHTML = `data: ${data.name}`;
+	})
+	.catch(err=>{
+		console.error(err);
+		e2.innerHTML = err;
+	})
+	
+</script>
+
+2. Promise.allSettled() /Async-Await  /TimeOut /Error-Handling:
+
+<div id="div2" style="background-color:#9E6767;"></div>
+<p id="e3" style="color:green;"></p>
+<p id="e4" style="color:blue;"></p>
+<p id="e5" style="color:hotpink;"></p>
+<script>
+	const URLS = [
+                `https://jsonplaceholder.typicode.com/comments/1`,
+                `https://jsonplaceholder.typicode.com/comments/2`,
+                `https://jsonplaceholder.typicode.com/comments/3` 
+	             ]
+    window.addEventListener('DOMContentLoaded', proAllSettled)
+	async function proAllSettled(){
+		let timer = setTimeout(()=>{
+			new AbortController().abort();
+			e4.innerHTML = `TIME_OUT_ERR:`
+		},1000);
+		let signal = new AbortController().signal;
+            let reqAll = await Promise.allSettled(URLS.map(url=>{ return fetch(url,{
+            	method:'GET',
+            	signal:signal
+            }).then(response=>{
+            	//Clear Timeout:
+            	clearTimeout(timer);
+            	console.log(response);
+            	return response.json();
+            })}))
+            .then(datas=>{
+            	console.log(datas);
+            	const finalData = datas.map((data,i)=>{
+            		if(data.status=='fulfilled'){
+            			return `Data:url:${i+1} ${data.value.name}<br>`;
+            		}
+            		else if(data.status=='rejected'){
+            			return `Err:${URLS[i]}Failed To Fetch:<br>//${data.reason}`;
+            		}
+            	});
+            	div2.innerHTML = finalData.join('');
+            })
+            .catch(err=>{
+            	console.error(err);
+            	e3.innerHTML = err;
+            })
+
+	}
+</script>
+
+========================================================
+THERE ARE TWO TYPE OF  CALLBACK FUNCTIONS ARE: {Synchronous & Asynchronous} : 
+CALLBACKS. 1 :
+
+SYNCHRONOUS: 
+i. Very Simple Example: 
+<script>
+
+function first(cb){
+	//first
+	console.log(`first function`);
+	cb();
+}
+//----------------------------------------------------
+function second(){
+	//second
+	console.log(`second function`);
+}
+
+first(second);
+
+
+</script>
+
+2. Example:
+
+<p id="t1" style="background-color:#031B17;color:white;"></p>
+<p id="t2" style="background-color:#031B17;color:yellow;"></p>
+
+<script>
+	function fun1(say_hi,callback){
+		t1.innerHTML = say_hi;
+        console.log(say_hi);
+        callback();
+	}
+	function fun2(){
+		t2.innerHTML = `how are you`;
+
+	}
+	fun1(`Hi`,fun2)
+</script>
+
+//---------------------------------------------------
+<p id="t3" style="background-color:#D59D9D;"></p>
+<p id="t4" style="background-color:#E9DBDB;"></p>
+<script>
+	function one(text1,callback){
+                 t3.innerHTML = text1;
+                 callback();
+
+	}
+
+	function two(){
+		t4.innerHTML = `hi text 1 !!!!!`;
+
+	}
+	one('i am text 1', two)
+</script>
+----------------------------------------------------------------
+<div id="s1" style="background-color:#52C0F3:"></div>
+<script>
+	const namesArray = ["Amit","Babita","Camaroon","Dean"];
+
+	function getNames(name,callback){
+            const d1 =  namesArray.map((name)=>{
+             	console.log(name);
+             	return `<li>${name} ${callback}</li>`;
+             	s1.innerHTML = d1;
+
+             })
+            //s1.innerHTML = d1;
+            callback();
+	}
+
+	function sayHiToNames(){
+		s1.innerHTML = `hi *** `;
+
+	}
+
+	getNames(...namesArray, sayHiToNames);
+</script>
+----------------------------------------------------------------
+CALLBACK 2:
+<script>
+	
+	// function
+function greet(name, callback) {
+    console.log('Hi' + ' ' + name);
+    callback();
+}
+
+// callback function
+function callMe() {
+    console.log('I am callback function');
+}
+
+// passing function as an argument
+greet('Peter', callMe);
+</script>
+-----------------------------------------------------------
+<script>
+//Callback 3:
+	const posts = [{title:"Post One",body:"This is body one"},{title:"Post Two",body:"This is body Two"}]
+
+</script>
+
+
+======================================================********************
+
+==========================================================********************
+
+POST :
+1. 
+ postUrl =  `https://reqres.in/api/users` 
+
+
+//-----------------------------------------
+
+
+
+<script>
+	const DATA = {
+	name:"Ranger",
+	city:"Euless",
+	info:{user_name:"myUser",password:1234},
+	email:"ranger@example.com"
+}
+console.log(DATA);
+	async function postData1(){
+           
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+ ========== PRINT ====================
+ =========HTTP REQ ; GET REQ ; 
+ ==================1.FETCH API/ 2. PROMISE.ALL / 3. PROMISE.ALL_SETTLED   ============
+<SCRIPT>
+const url1 = `https://jsonplaceholder.typicode.com/comments/1`
+const url2 =`https://jsonplaceholder.typicode.com/comments/2`
+const url3 = `https://jsonplaceholder.typicode.com/comments/3`
+</SCRIPT>
+1.
+HTTP REQUEST WITH FETCH API:
+	
+	<p id="a1" style="background-color:yellow;"></p> 
+	<p id="e1"></p>
+<script>
+	let a1 = document.getElementById('a1');
+	fetch(url1)
+	.then(response=>{
+		return response.json();
+	})
+	.then(data=>{
+		console.log(data);
+        a1.innerHTML = `NAME: ${data.name.toUpperCase()}`;
+
+	})
+	.catch(err=>{
+		console.warn(err);
+		e1.innerHTML = err;
+	})
+</script>
+------------------------------------------------------------
+2.
+HTTP WITH FETCH API AND ASYNC/AWAIT :
+
+<p id="a2" style="background-color:#F0B3B3;"></p>
+<p id="e2"></p>
+<script>
+	async function fetReq1(){
+		let request = await fetch(url2);
+        //error handling:
+        if(request.status>=400 && request<600){
+        	throw new Error(`Server error:${request.status}`)
+        }
+        if(request.status!==200){
+        	throw new Error(`Network Err: ${request.status}`)
+        }
+       let response = await request.json();
+       return response;
+    }
+	fetReq1()
+	.then(data=>{
+		console.log(data);
+		a2.innerHTML = `Name: ${data.name}`;
+	})
+	.catch(error=>{
+		console.error(error);
+		e2.innerHTML = error;
+	})
+</script>
+----------------------------------------------------------------
+3.
+HTTP REQUEST WITH PROMISE.ALL() / ASYNC/AWAIT : 
+
+<p id="a3" style="background-color:#7D50D8;"></p>
+<p id="e3"></p>
+(3. i)
+<script>
+	/*const urls = [
+	`https://jsonplaceholder.typicode.com/comments/1`,
+	`https://jsonplaceholder.typicode.com/comments/2`,
+	`https://jsonplaceholder.typicode.com/comments/3`
+	];*/
+	 async function proAll1(){
+	 	const urls = [
+	`https://jsonplaceholder.typicode.com/comments/1`,
+	`https://jsonplaceholder.typicode.com/comments/2`,
+	`https://jsonplaceholder.typicode.com/comments/3`
+	];
+	 	let a3 = document.getElementById('a3');
+		let requests =  Promise.all(urls.map((url)=>
+			fetch(url).then(response=>{
+				console.log(response);
+				const resAll = response.json();
+				console.log(resAll);
+				return resAll;
+			})
+		));//await:use in-front of Promise/ so we put it in-front of variable of Promise.all()
+		await requests.then(data=>{
+			console.log(data);
+			let myData = data.map((d)=>{
+				return `${d.name}`;
+			})
+			a3.innerHTML = myData; 
+		})
+	}
+	proAll1();
+</script>
+-------------------------------------------------------------------
+3.ii
+practice:
+<p id="v1" style="background-color:#C1D856;"></p>
+<p id="err1"></p>
+
+<script>
+	async function multiReq(){
+		const myUrls = [
+	`https://jsonplaceholder.typicode.com/comments/1`,
+	`https://jsonplaceholder.typicode.com/comments/2`,
+	`https://jsonplaceholder.typicode.com/comments/3`
+	];
+           let requests = Promise.all(myUrls.map(url=> fetch(url).then(response=>{ return response.json()})))
+           //Promise.all gives 'a single Promise'. and we know we use 'await' with Promise
+           await requests.then(datas=>{
+           	const dataHtml = datas.map((data)=>{
+           		return `Name: ${data.name} ,E-Mail: ${data.email}<br>`;
+           	});
+           	v1.innerHTML = dataHtml.join("");
+           })
+	}
+	multiReq()
+</script>
+----------------------------------------------------------------------------
+4.HTTP REQUEST WITH PROMISE.ALL_SETTLE() :
+  Example 1.   Simple Request
+
+<p id="a4" style="background-color:#EBA643;"></p>
+<p id="e4" style="color:red;"></p>
+<script>
+	let a4 = document.getElementById('a4');
+	const _urls = [
+	`https://jsonplaceholder.typicode.com/comments/1`,
+	`https://jsonplaceholder.typicode.com/comments/2`,
+	`https://jsonplaceholder.typicode.com/comments/3`
+	];
+	async function proAllSettled(){
+		const resAll = await Promise.allSettled(_urls.map(_url=> fetch(_url)
+			.then(response=>{
+			const resData= response.json();
+			console.log(resData);//Promise{<pending>}
+			return resData;
+		})))
+		.then(datas=>{
+			console.log(datas);/* 0: {status: 'fulfilled', value: {…}}
+                                  1: {status: 'fulfilled', value: {…}}
+                                  2: {status: 'fulfilled', value: {…}}
+                                  length: 3
+                                  [[Prototype]]: Array(0)*/
+                const showHtml = datas.map((data,i)=>{
+                	return `<p style="color:white;">${data.value.name}</p> <br>`;
+                
+                });
+                a4.innerHTML = showHtml.join("");
+                
+		})
+	}
+	proAllSettled()
+</script>
+-----------------------------------------------------------------------
+4.
+HTTP REQUEST WITH PROMISE.ALL_SETTLED:
+ Example 2. Use Error Hnadling Too : (use if /else if statement)
+
+<div id="z1" style="background-color:#2AD784;"></div>
+<p id="error1" style="background-color:red;"></p>
+
+<script>
+	let z1 = document.getElementById('z1');
+	let error1 = document.getElementById('error1');
+	const dataUrls = [
+	`https://jsonplaceholder.typicode.com/todos/1`,
+	`https://jsonplaceholder.typicode.com/todos/2`,
+	`https://jsonplaceholder.typicode.com/todos/3`
+	];
+
+	async function async1(){
+		let reqAll = await Promise.allSettled(dataUrls.map(url=> fetch(url).then(res=>{
+			return res.json();
+		})))
+		.then(datas=>{
+			console.log(datas);
+			const htmlData = datas.map((data,i)=>{
+				if(data.status=='fulfilled'){
+					return `<p>Title: ${data.value.title}</p><br>`
+				}
+				else if(data.status=='rejected'){
+					return `ERR: ${dataUrls[i]} has ${data.reason} error`;
+				}
+			})
+            z1.innerHTML = htmlData;
+		})
+		.catch(err=>{
+			console.error(err);
+			error1.innerHTML = err;
+		})
+	}
+	async1()
+</script>
+--------------------------------------------------------------------------
+5.
+HTTP REQUEST WITH FETCH API; ASYNC/AWAIT & SET TIMEOUT(ABORT-CONTROLLER) : 
+
+The Abort-Signal Interface Represents A 'Signal Object' That Allows You To Communicate With A 
+DOM Request (such as a fetch request) And abort It If Required ;via an 'AbortController Object'.
+
+1st We Create new AbortController Object Using AbortController() Constructor. 
+
+<div id="d1" style="background-color:#EC5276;"></div>
+<p id="err1" style="background-color:red;"></p>
+<p id="s1" style="background-color:yellow;color:red;"></p>
+<script>
+	window.addEventListener('DOMContentLoaded', fetchAsync);
+	async function fetchAsync(){
+
+		let timer = setTimeout(()=>{
+			new AbortController().abort();
+			s1.innerHTML = `Timed Out!!!`
+		},500)
+        let signal = new AbortController().signal;
+		 
+		let request = await fetch(url1,{
+			method:'GET',
+			signal:signal 
+		})
+		clearTimeout(timer);
+
+		if(request.status>=400 && request.status<600){
+			throw new Error(`Server Err: ${request.status}`)
+		}
+		else if(request.status!==200){
+			throw new Error(`Network Err: ${request.status}`)
+		}
+
+		let result = await request.json();
+		return result;
+	}
+	fetchAsync()
+	.then(data=>{
+		console.log(data);
+		d1.innerHTML = `DATA: ${data.name}`;
+	})
+	.catch(err=>{
+		console.log(err);
+		err1.innerHTML = err;
+	})
+</script>
+
+--------------timeout/ PromiseAllSettled------------------- 
+<div id="div3" style="background-color:#7414EA;"></div>
+<p id="x1" style="background-color:blue;"></p>
+<p id="x2" style="background-color:black;color:white;"></p>
+<p id="x3"></p>
+<script>
+	const urlArr = [
+	        `https://jsonplaceholder.typicode.com/todos/1`,
+	        `https://jsonplaceholder.typicode.com/todos/2`,
+	        `https://jsonplaceholder.typicode.com/todos/3`
+	    ];
+	window.addEventListener('DOMContentLoaded',async3);
+
+async function async3(){
+		    let timer = setTimeout(()=>{
+		        new AbortController().abort();
+		        x1.innerHTML = `Req Timed Out`;
+		        },3000);
+		    
+let signal = new AbortController().signal;
+            
+    let httpReq = await Promise.allSettled(urlArr.map(url=>{return fetch(url,{method:'GET',signal:signal}
+                 	)//end fetch 
+                 	.then(response=>{
+                 		//clearTimeOut:
+                 		clearTimeout(timer);
+                 		console.log(response);
+                 		return response.json();
+                 	})}))//close Peomise.allSettled 
+                 .then(datas=>{
+                 	console.log(datas);
+                 	const finalData = datas.map((data,i)=>{
+                 		console.log(data);
+                 		console.log(i);
+                 		if(data.status=='fulfilled'){
+                 			return `Data : ${data.value.id}: ${data.value.title}<br>`;
+                 		}
+                 		else if(data.status=='rejected'){
+                 			return `${urlArr[i]} Failed To Fetch /${data.reason}<br>`;
+                 		}
+
+                 	})
+                 	div3.innerHTML = finalData.join("");
+                 })
+                 .catch(err=>{
+                 	console.log(err);
+             x2.innerHTML = err;
+        })
+	}
+</script>
+</body>
+</html>
